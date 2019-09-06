@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from pydub import AudioSegment
 import youtube_dl
 import os
+import subprocess
 
 class MyLogger(object):
     def debug(self, msg):
@@ -18,29 +19,38 @@ def my_hook(d):
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
 
+def convert_to_pcm(output_filename, start_time, end_time):
+  output = subprocess.getoutput(['ffmpeg', '-i', 'download.wav',
+                             '-ss', str(start_time), '-to', str(end_time),
+                             output_filename])
+  print(output)
+
 
 title = 'peter' #input("Enter Song Title")
 file_format = 'mp3' #input("Enter codec")
 
 # Join title and codec under PEP-8 convention
-filename = '.'.join([title, 'wav'])
+pcm_filename = '.'.join([title, 'wav'])
+output_filename = '.'.join([title, file_format])
 
 ydl_opts = {
     'format': 'bestaudio/best',
-    'outtmpl': filename,
+    'outtmpl': 'download.wav',
     'logger': MyLogger(),
     'progress_hooks': [my_hook],
 }
-
+'ffmpeg -i peter.wav out.wav'
 
 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
   ydl.download(['www.youtube.com/watch?v=hm6COzCAQhg'])
 
-t1 = 0 * 1000 #Works in milliseconds
-t2 = 60 * 1000
-audio_abs_path = os.path.abspath("peter.wav")
+t1 = 0
+t2 = 60
+convert_to_pcm(output_filename,t1,t2)
+"""
+audio_abs_path = os.path.abspath(pcm_filename)
 newAudio = AudioSegment.from_wav(audio_abs_path)
 newAudio = newAudio[t1:t2]
-newAudio.export(filename, format=file_format) #Exports to a wav file in the current path.
-
+newAudio.export(output_filename, format=file_format) #Exports to a wav file in the current path.
+"""
 
