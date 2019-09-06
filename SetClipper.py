@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 from pydub import AudioSegment
 import youtube_dl
 import os
+import os.path
 import subprocess
+import shutil
 
 __version__ = "0.1.0"
 
@@ -30,16 +32,34 @@ class MyLogger(object):
     def error(self, msg):
         print(msg)
 
+class MediaConverter(youtube_dl.YoutubeD):
+    def __main__(self, options):
+        super().__init__(options)
+        self.options = options
+        self.ids = []
 
+    def convert_to_pcm(self, output_filename, start_time, end_time):
+        output = subprocess.getoutput(['ffmpeg', '-i', 'download.wav',
+                                      '-ss', str(start_time), '-to', str(end_time),
+                                      output_filename])
+        return output
+
+    def download(self, url):
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+        video_id = self._get_id(url)
+
+    def _get_id(self, url):
+      if "youtube.com/watch?v=" in url:
+        return re.replace('https://www.youtube.com/watch?v=', '')
+      else:
+        raise Exception('Currently only Youtube is supported.')
+
+        
 def my_hook(d):
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
-
-def convert_to_pcm(output_filename, start_time, end_time):
-  output = subprocess.getoutput(['ffmpeg', '-i', 'download.wav',
-                             '-ss', str(start_time), '-to', str(end_time),
-                             output_filename])
-  print(output)
+          
 
 print(BANNER)
 title = 'peter' #input("Enter Song Title")
@@ -57,8 +77,6 @@ ydl_opts = {
 }
 'ffmpeg -i peter.wav out.wav'
 
-with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-  ydl.download(['www.youtube.com/watch?v=hm6COzCAQhg'])
 
 t1 = 0
 t2 = 60
