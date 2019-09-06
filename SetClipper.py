@@ -4,6 +4,22 @@ import youtube_dl
 import os
 import subprocess
 
+__version__ = "0.1.0"
+
+BANNER = r"""    ____________________________
+  /|............................|
+ | |:          Cassetter       :|
+ | |:        Joss Moffatt      :|
+ | |:     ,-.   _____   ,-.    :|
+ | |:    ( `)) [_____] ( `))   :|
+ |v|:     `-`   ' ' '   `-`    :|
+ |||:     ,______________.     :|
+ |||...../::::o::::::o::::\.....|
+ |^|..../:::O::::::::::O:::\....|
+ |/`---/--------------------`---|
+ `.___/ /====/ /=//=/ /====/____/
+      `--------------------'"""[1:]
+
 class MyLogger(object):
     def debug(self, msg):
         pass
@@ -25,7 +41,7 @@ def convert_to_pcm(output_filename, start_time, end_time):
                              output_filename])
   print(output)
 
-
+print(BANNER)
 title = 'peter' #input("Enter Song Title")
 file_format = 'mp3' #input("Enter codec")
 
